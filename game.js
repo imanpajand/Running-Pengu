@@ -442,7 +442,7 @@
           this.tRex.update(deltaTime);
           this.raq();
         }
-      }, // ⬅️ کاما (یا در صورتی که آخرین متد است، کاما را حذف کنید)
+      },
       handleEvent: function (e) {
         return function (evtType, events) {
           switch (evtType) {
@@ -485,7 +485,7 @@
           document.removeEventListener(Runner.events.MOUSEDOWN, this);
           document.removeEventListener(Runner.events.MOUSEUP, this);
         }
-      }, // ⬅️ کاما (یا در صورتی که آخرین متد است، کاما را حذف کنید)
+      },
       onKeyDown: function (e) {
         if (e.target != this.detailsButton) {
           if (!this.crashed && (Runner.keycodes.JUMP[String(e.keyCode)] || e.type == Runner.events.TOUCHSTART)) {
@@ -597,7 +597,7 @@
         }, 300); // 🚫 هیچ گیم‌اور محلی اجرا نشود
 
         return;
-      }, // ⬅️ کاما برای جدا کردن از متد بعدی
+      },
 
       stop: function () {
         this.activated = false;
@@ -615,6 +615,7 @@
         }
       },
       restart: function () {
+        console.log("🔄 Restart function called");
         if (!this.raqId) {
           this.playCount++;
           this.runningTime = 0;
@@ -629,7 +630,11 @@
           this.horizon.reset();
           this.tRex.reset();
           this.playSound(this.soundFx.BUTTON_PRESS);
+          this.startListening(); // اضافه کردن این خط برای فعال کردن دوباره ورودی‌ها
           this.update();
+          console.log("✅ Game restarted successfully");
+        } else {
+          console.log("⚠️ Game is already running, cannot restart");
         }
       },
       onVisibilityChange: function (e) {
@@ -2294,21 +2299,46 @@
     <!-- </script> -->
   </div>
   <script>
-    if (window.FarcadeSDK) {
-      // ۱. هندلر Play Again (بسیار مهم)
-      window.FarcadeSDK.on("play_again", () => {
-        if (Runner.instance_ && Runner.instance_.crashed) {
-          // این تابع بازی را از حالت کرش به حالت شروع مجدد برمی‌گرداند.
-          Runner.instance_.restart();
-        }
-      });
+    // هندلرهای SDK - باید بعد از لود شدن SDK اجرا شوند
+    function setupSDKHandlers() {
+      if (window.FarcadeSDK) {
+        // ۱. هندلر Play Again (بسیار مهم)
+        window.FarcadeSDK.on("play_again", () => {
+          console.log("🎮 Play Again triggered");
+          if (Runner.instance_) {
+            // اطمینان از اینکه بازی در حالت کرش است
+            if (Runner.instance_.crashed) {
+              console.log("🔄 Restarting game...");
+              Runner.instance_.restart();
+            } else {
+              console.log("⚠️ Game is not crashed, cannot restart");
+            }
+          } else {
+            console.log("⚠️ Runner instance not found");
+          }
+        });
 
-      // ۲. هندلر Mute/Unmute (اختیاری اما توصیه می‌شود)
-      window.FarcadeSDK.on("toggle_mute", (data) => {
-        if (Runner.instance_) {
-          Runner.instance_.isMuted = data.isMuted;
+        // ۲. هندلر Mute/Unmute (اختیاری اما توصیه می‌شود)
+        window.FarcadeSDK.on("toggle_mute", (data) => {
+          console.log("🔇 Toggle mute:", data.isMuted);
+          if (Runner.instance_) {
+            Runner.instance_.isMuted = data.isMuted;
+          }
+        });
+      }
+    }
+
+    // تلاش برای تنظیم هندلرها
+    if (window.FarcadeSDK) {
+      setupSDKHandlers();
+    } else {
+      // اگر SDK هنوز لود نشده، منتظر بمان
+      const checkSDK = setInterval(() => {
+        if (window.FarcadeSDK) {
+          setupSDKHandlers();
+          clearInterval(checkSDK);
         }
-      });
+      }, 100);
     }
   </script>
 
