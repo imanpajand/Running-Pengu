@@ -6,7 +6,10 @@
   <meta charset="UTF-8" />
   <script>
     function hideClass(name) {
-      for (var elem of $(name)) elem.style.display = "none";
+      var elements = document.querySelectorAll(name);
+      for (var i = 0; i < elements.length; i++) {
+        elements[i].style.display = "none";
+      }
     }
     var DEFAULT_WIDTH = 600,
       FPS = 60;
@@ -76,6 +79,7 @@
       CRASHED: "crashed",
       ICON: "icon-offline",
       TOUCH_CONTROLLER: "controller",
+      PLAYER: "player",
     };
     Runner.imageSources = {
       LDPI: [
@@ -349,7 +353,7 @@
             this.gameOverPanel.draw();
           }
         }
-      }, // ⬅️ کاما
+      }
 
       playIntro: function () {
         if (!this.started && !this.crashed) {
@@ -440,9 +444,9 @@
         }
         if (!this.crashed) {
           this.tRex.update(deltaTime);
-          this.raq();
+          this.raf();
         }
-      }, // ⬅️ کاما (یا در صورتی که آخرین متد است، کاما را حذف کنید)
+      },
       handleEvent: function (e) {
         return function (evtType, events) {
           switch (evtType) {
@@ -472,7 +476,7 @@
           document.addEventListener(Runner.events.MOUSEDOWN, this);
           document.addEventListener(Runner.events.MOUSEUP, this);
         }
-      }, // ⬅️ کاما
+      }
 
       stopListening: function () {
         document.removeEventListener(Runner.events.KEYDOWN, this);
@@ -485,7 +489,7 @@
           document.removeEventListener(Runner.events.MOUSEDOWN, this);
           document.removeEventListener(Runner.events.MOUSEUP, this);
         }
-      }, // ⬅️ کاما (یا در صورتی که آخرین متد است، کاما را حذف کنید)
+      } (یا در صورتی که آخرین متد است، کاما را حذف کنید)
       onKeyDown: function (e) {
         if (e.target != this.detailsButton) {
           if (!this.crashed && (Runner.keycodes.JUMP[String(e.keyCode)] || e.type == Runner.events.TOUCHSTART)) {
@@ -536,14 +540,14 @@
           this.play();
         }
       },
-      raq: function () {
+      raf: function () {
         if (!this.drawPending) {
           this.drawPending = true;
-          this.raqId = requestAnimationFrame(this.update.bind(this));
+          this.rafId = requestAnimationFrame(this.update.bind(this));
         }
       },
       isRunning: function () {
-        return !!this.raqId;
+        return !!this.rafId;
       },
       gameOver: function () {
         console.log("🧊 Game Over Triggered");
@@ -597,13 +601,13 @@
         }, 300); // 🚫 هیچ گیم‌اور محلی اجرا نشود
 
         return;
-      }, // ⬅️ کاما برای جدا کردن از متد بعدی
+      } برای جدا کردن از متد بعدی
 
       stop: function () {
         this.activated = false;
         this.paused = true;
-        cancelAnimationFrame(this.raqId);
-        this.raqId = 0;
+        cancelAnimationFrame(this.rafId);
+        this.rafId = 0;
       },
       play: function () {
         if (!this.crashed) {
@@ -615,7 +619,8 @@
         }
       },
       restart: function () {
-        if (!this.raqId) {
+        console.log("🔄 Restarting game...");
+        if (!this.rafId) {
           this.playCount++;
           this.runningTime = 0;
           this.activated = true;
@@ -629,7 +634,12 @@
           this.horizon.reset();
           this.tRex.reset();
           this.playSound(this.soundFx.BUTTON_PRESS);
+          // 🚨 اضافه کردن startListening برای ریست کامل
+          this.startListening();
           this.update();
+          console.log("✅ Game restarted successfully");
+        } else {
+          console.log("⚠️ Game is already running, cannot restart");
         }
       },
       onVisibilityChange: function (e) {
@@ -1009,6 +1019,7 @@
       RUNNING: "RUNNING",
       WAITING: "WAITING",
     };
+    Trex.BLINK_TIMING = 7000;
     Trex.animFrames = {
       WAITING: {
         frames: [44, 0],
@@ -2297,9 +2308,16 @@
     if (window.FarcadeSDK) {
       // ۱. هندلر Play Again (بسیار مهم)
       window.FarcadeSDK.on("play_again", () => {
-        if (Runner.instance_ && Runner.instance_.crashed) {
-          // این تابع بازی را از حالت کرش به حالت شروع مجدد برمی‌گرداند.
-          Runner.instance_.restart();
+        console.log("🎮 Play Again triggered");
+        if (Runner.instance_) {
+          if (Runner.instance_.crashed) {
+            console.log("🔄 Restarting game from crashed state");
+            Runner.instance_.restart();
+          } else {
+            console.log("⚠️ Game is not in crashed state, cannot restart");
+          }
+        } else {
+          console.log("❌ Runner instance not found");
         }
       });
 
@@ -2307,6 +2325,7 @@
       window.FarcadeSDK.on("toggle_mute", (data) => {
         if (Runner.instance_) {
           Runner.instance_.isMuted = data.isMuted;
+          console.log("🔇 Mute state:", data.isMuted);
         }
       });
     }
