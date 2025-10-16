@@ -124,41 +124,84 @@
     };
     // 🛑 این بلوک، کل کد آغازین بازی در انتهای فایل HTML را جایگزین می‌کند.
 
+    // ⚠️ تابع ثبت Event Handlers - باید قبل از initializeGame تعریف شود
+    function setupSDKEventHandlers() {
+      if (!window.FarcadeSDK) {
+        console.warn("⚠️ Cannot setup SDK event handlers - SDK not loaded");
+        return;
+      }
+
+      // ۱. هندلر Play Again (بسیار مهم)
+      window.FarcadeSDK.on("play_again", () => {
+        console.log("🔄 Play Again triggered");
+        if (Runner.instance_ && Runner.instance_.crashed) {
+          Runner.instance_.restart();
+          console.log("✅ Game restarted");
+        } else {
+          console.warn("⚠️ Cannot restart - game not in crashed state");
+        }
+      });
+
+      // ۲. هندلر Mute/Unmute (اختیاری اما توصیه می‌شود)
+      window.FarcadeSDK.on("toggle_mute", (data) => {
+        console.log("🔇 Mute toggled:", data.isMuted);
+        if (Runner.instance_) {
+          Runner.instance_.isMuted = data.isMuted;
+        }
+      });
+
+      console.log("✅ SDK Event Handlers registered successfully");
+    }
+
     function initializeGame() {
       var sdkActive = window.FarcadeSDK && window.FarcadeSDK.singlePlayer;
 
       // ۱. اجرای "Remix Only": اگر SDK فعال نیست، متوقف شو.
       if (!sdkActive) {
         console.error("Farcade SDK not found. Game must run inside the platform.");
-        // *اختیاری*: اگر می‌خواهید چیزی نمایش داده نشود، می‌توانید Runner container را مخفی کنید.
-        // document.querySelector('#runner-container').style.display = 'none';
         return;
       }
 
-      // ۲. اجرای بازی (فقط اگر SDK فعال باشد)
-      window.RUNNER = new Runner("#runner-container"); // فرض بر این است که Runner در یک کانتینر با id='runner-container' است.
+      // ۲. ثبت Event Handlers قبل از شروع بازی
+      if (typeof setupSDKEventHandlers === 'function') {
+        setupSDKEventHandlers();
+      }
 
-      // ۳. فراخوانی ready() با یک تأخیر ایمن (Timeout) برای تضمین آمادگی پلتفرم.
-      // این تأخیر مشکل زمان‌بندی موبایل را حل می‌کند.
+      // ۳. اجرای بازی (فقط اگر SDK فعال باشد)
+      window.RUNNER = new Runner("#runner-container");
+
+      // ۴. فراخوانی ready() با تأخیر بیشتر برای موبایل (1500ms)
       setTimeout(() => {
-        window.FarcadeSDK.singlePlayer.actions.ready();
-        console.log("Farcade ready signal sent successfully.");
-      }, 500); // 500 میلی‌ثانیه تأخیر، زمان کافی برای لود شدن پنل‌های SDK.
+        if (window.FarcadeSDK && window.FarcadeSDK.singlePlayer && window.FarcadeSDK.singlePlayer.actions) {
+          window.FarcadeSDK.singlePlayer.actions.ready();
+          console.log("✅ Farcade ready signal sent successfully.");
+        } else {
+          console.warn("⚠️ SDK not ready after timeout");
+        }
+      }, 1500); // ⬅️ افزایش به 1500ms برای موبایل
     }
 
-    // 💥 استفاده از Listener امن برای شروع بازی پس از لود شدن کامل صفحه (و SDK)
+    // 💥 استفاده از Listener امن با retry بیشتر برای موبایل
     document.addEventListener("DOMContentLoaded", () => {
-      // از آنجایی که SDK ناهمگام است، از یک لوپ برای چک کردن لود شدن SDK استفاده می‌کنیم
+      var attempts = 0;
+      var maxAttempts = 50; // ⬅️ افزایش به 50 تلاش (5 ثانیه)
+      
       var sdkCheckInterval = setInterval(() => {
-        // SDK و آبجکت singlePlayer باید تعریف شده باشند.
-        if (window.FarcadeSDK && window.FarcadeSDK.singlePlayer && document.readyState === "complete") {
+        attempts++;
+        
+        // چک کردن کامل SDK
+        if (window.FarcadeSDK && window.FarcadeSDK.singlePlayer && window.FarcadeSDK.singlePlayer.actions) {
           clearInterval(sdkCheckInterval);
+          console.log("✅ SDK loaded successfully after", attempts, "attempts");
           initializeGame();
-        } else if (document.readyState === "complete") {
-          // اگر صفحه کاملاً لود شد اما SDK لود نشد،
-          // بازی را در حالت "Remix Only" متوقف کن.
+          return;
+        }
+        
+        // اگر به حداکثر تلاش رسید
+        if (attempts >= maxAttempts) {
           clearInterval(sdkCheckInterval);
-          initializeGame(); // که در داخل آن دوباره چک می‌شود و متوقف می‌شود.
+          console.error("❌ SDK not loaded after", maxAttempts, "attempts (5 seconds)");
+          // در production بازی بدون SDK اجرا نشود
         }
       }, 100); // هر ۱۰۰ میلی‌ثانیه چک کن
     });
@@ -547,6 +590,12 @@
       },
       gameOver: function () {
         console.log("🧊 Game Over Triggered");
+        console.log("📱 SDK State at Game Over:", {
+          hasFarcadeSDK: !!window.FarcadeSDK,
+          hasSinglePlayer: !!(window.FarcadeSDK && window.FarcadeSDK.singlePlayer),
+          hasActions: !!(window.FarcadeSDK && window.FarcadeSDK.singlePlayer && window.FarcadeSDK.singlePlayer.actions),
+          isMobile: IS_MOBILE
+        });
 
         this.playSound(this.soundFx.HIT);
         vibrate(200); // 🛑 توقف حلقه اصلی و ورودی‌های کاربر (بسیار مهم)
@@ -584,7 +633,7 @@
         }; // 🕐 تلاش چندباره در صورتی که SDK هنوز آماده نیست (حداکثر ۱۰ بار در ۳ ثانیه)
 
         let attempts = 0;
-        const maxAttempts = 10;
+        const maxAttempts = 20; // ⬅️ افزایش به 20 تلاش
 
         const retryInterval = setInterval(() => {
           const success = triggerRemixGameOver();
@@ -592,9 +641,16 @@
 
           if (success || attempts >= maxAttempts) {
             clearInterval(retryInterval);
-            if (!success) console.warn("⚠️ Remix SDK not ready after multiple tries.");
+            if (!success) {
+              console.error("❌ Remix SDK not ready after", maxAttempts, "tries (10 seconds)");
+              console.error("SDK State:", {
+                hasFarcadeSDK: !!window.FarcadeSDK,
+                hasSinglePlayer: !!(window.FarcadeSDK && window.FarcadeSDK.singlePlayer),
+                hasActions: !!(window.FarcadeSDK && window.FarcadeSDK.singlePlayer && window.FarcadeSDK.singlePlayer.actions)
+              });
+            }
           }
-        }, 300); // 🚫 هیچ گیم‌اور محلی اجرا نشود
+        }, 500); // ⬅️ افزایش به 500ms (کل 10 ثانیه)
 
         return;
       }, // ⬅️ کاما برای جدا کردن از متد بعدی
@@ -2294,22 +2350,7 @@
     <!-- </script> -->
   </div>
   <script>
-    if (window.FarcadeSDK) {
-      // ۱. هندلر Play Again (بسیار مهم)
-      window.FarcadeSDK.on("play_again", () => {
-        if (Runner.instance_ && Runner.instance_.crashed) {
-          // این تابع بازی را از حالت کرش به حالت شروع مجدد برمی‌گرداند.
-          Runner.instance_.restart();
-        }
-      });
-
-      // ۲. هندلر Mute/Unmute (اختیاری اما توصیه می‌شود)
-      window.FarcadeSDK.on("toggle_mute", (data) => {
-        if (Runner.instance_) {
-          Runner.instance_.isMuted = data.isMuted;
-        }
-      });
-    }
+    // Event handlers الان در بالای فایل تعریف شده‌اند
   </script>
 
   <script type="text/javascript">
