@@ -2,7 +2,6 @@
 <head>
      
   <script src="https://cdn.jsdelivr.net/npm/@farcade/game-sdk@0.2.1/dist/index.min.js"></script>
-
   <meta charset="UTF-8" />
   <script>
     function hideClass(name) {
@@ -136,7 +135,11 @@
       }
 
       // ۲. اجرای بازی (فقط اگر SDK فعال باشد)
-      window.RUNNER = new Runner("#runner-container"); // فرض بر این است که Runner در یک کانتینر با id='runner-container' است.
+      var containerSelector = document.querySelector("#runner-container")
+        ? "#runner-container"
+        : ".interstitial-wrapper";
+      window.RUNNER = new Runner(containerSelector);
+      Runner.instance_ = window.RUNNER; // make sure global instance points to the correct one
 
       // ۳. فراخوانی ready() با یک تأخیر ایمن (Timeout) برای تضمین آمادگی پلتفرم.
       // این تأخیر مشکل زمان‌بندی موبایل را حل می‌کند.
@@ -326,7 +329,7 @@
               this.containerEl.style.width = this.dimensions.WIDTH + "px";
               this.containerEl.style.height = this.dimensions.HEIGHT + "px";
             }
-            return; // ⬅️ خروج سریع برای جلوگیری از this.clearCanvas() و redraw
+            // ⬅️ خروج سریع برای جلوگیری از this.clearCanvas() و redraw
           }
 
           this.canvas.width = this.dimensions.WIDTH;
@@ -549,26 +552,36 @@
         console.log("🧊 Game Over Triggered");
 
         this.playSound(this.soundFx.HIT);
-        vibrate(200); // 🛑 توقف حلقه اصلی و ورودی‌های کاربر (بسیار مهم)
+        vibrate(200);
 
+        // 🛑 توقف حلقه اصلی و ورودی‌های کاربر
         this.stop();
-        this.stopListening(); // از ری‌استارت ناخواسته با لمس جلوگیری می‌کند
+        this.stopListening();
 
         this.crashed = true;
         this.playingIntro = false;
-        this.time = getTimeStamp(); // اجبار به رندر نهایی حالت کرش قبل از فراخوانی SDK
+        this.time = getTimeStamp();
+
+        // ❌ حذف نمایش پنل گیم اور محلی
+        if (this.gameOverPanel) {
+          this.gameOverPanel.hide();
+        }
+
+        // اجبار به رندر نهایی حالت کرش (برای دیدن پنگوئن در حالت مرده)
         this.clearCanvas();
         this.horizon.update(0, 0, true);
         this.tRex.update(100, Trex.status.CRASHED);
-        this.distanceMeter.update(0, Math.ceil(this.distanceRan)); // جلوگیری از هر نوع رندر یا ری‌درای داخلی در حین لود شدن پنل
+        this.distanceMeter.update(0, Math.ceil(this.distanceRan));
 
+        // تضمین ابعاد کانتینر برای Overlay پلتفرم
         if (this.containerEl) {
           this.containerEl.style.width = this.dimensions.WIDTH + "px";
           this.containerEl.style.height = this.dimensions.HEIGHT + "px";
         }
 
-        const scoreValue = Math.ceil(this.distanceRan); // 🟣 تابع کمکی برای ارسال گیم‌اور به Remix
+        const scoreValue = Math.ceil(this.distanceRan);
 
+        // 🟣 منطق ارسال Game Over به Remix
         const triggerRemixGameOver = () => {
           try {
             if (window.FarcadeSDK && window.FarcadeSDK.singlePlayer && window.FarcadeSDK.singlePlayer.actions) {
@@ -581,10 +594,11 @@
             console.warn("⚠️ Remix gameOver failed:", err);
           }
           return false;
-        }; // 🕐 تلاش چندباره در صورتی که SDK هنوز آماده نیست (حداکثر ۱۰ بار در ۳ ثانیه)
+        };
 
+        // 🕐 تلاش چندباره برای اطمینان از ارسال موفق (Retry Logic)
         let attempts = 0;
-        const maxAttempts = 10;
+        const maxAttempts = 40; // 12 ثانیه با فاصله 300 میلی‌ثانیه
 
         const retryInterval = setInterval(() => {
           const success = triggerRemixGameOver();
@@ -594,7 +608,7 @@
             clearInterval(retryInterval);
             if (!success) console.warn("⚠️ Remix SDK not ready after multiple tries.");
           }
-        }, 300); // 🚫 هیچ گیم‌اور محلی اجرا نشود
+        }, 300);
 
         return;
       }, // ⬅️ کاما برای جدا کردن از متد بعدی
@@ -619,7 +633,8 @@
           this.playCount++;
           this.runningTime = 0;
           this.activated = true;
-          this.crashed = false;
+          this.paused = false; // ← اضافه شد
+          this.crashed = false; // ← اضافه شد
           this.distanceRan = 0;
           this.setSpeed(this.config.SPEED);
           this.time = getTimeStamp();
@@ -629,6 +644,7 @@
           this.horizon.reset();
           this.tRex.reset();
           this.playSound(this.soundFx.BUTTON_PRESS);
+          this.startListening();
           this.update();
         }
       },
@@ -676,7 +692,13 @@
       return false;
     };
     var getRandomNum = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-    var vibrate = (duration) => navigator.vibrate(duration);
+    // جایگزین کنید
+    var vibrate = (duration) => {
+      if (typeof navigator.vibrate === "function") {
+        navigator.vibrate(duration);
+      }
+    };
+
     function createCanvas(container, width, height, opt_classname) {
       var canvas = document.createElement("canvas");
       canvas.className = opt_classname ? Runner.classes.CANVAS + " " + opt_classname : Runner.classes.CANVAS;
@@ -2192,8 +2214,8 @@
       "
     >
       <a href="https://x.com/imanpjnir" target="_blank"><strong> </strong></a>
-      <a href="https://x.com/imanpjnir" target="_blank"><strong>by ImanPJN </strong></a>.<br />
-      Press Space or Touch Bar to start the game.
+      <a href="https://x.com/imanpjnir" target="_blank">by ImanPJN</a><br />
+      Press Space or Touch the screen to start.
     </div>
     <!-- <div id="main-frame-notchrome" style="display:none; margin-top:50px;">Sorry, this game only runs on the Google Chrome! You can download it free <a href="https://www.google.com/chrome">here</a></div> -->
     <div id="offline-resources" jstcache="0">
@@ -2297,22 +2319,14 @@
     if (window.FarcadeSDK) {
       // ۱. هندلر Play Again (بسیار مهم)
       window.FarcadeSDK.on("play_again", () => {
+        if (window.RUNNER && window.RUNNER.crashed) {
+          window.RUNNER.restart();
+          return;
+        }
         if (Runner.instance_ && Runner.instance_.crashed) {
-          // این تابع بازی را از حالت کرش به حالت شروع مجدد برمی‌گرداند.
           Runner.instance_.restart();
         }
       });
-
-      // ۲. هندلر Mute/Unmute (اختیاری اما توصیه می‌شود)
-      window.FarcadeSDK.on("toggle_mute", (data) => {
-        if (Runner.instance_) {
-          Runner.instance_.isMuted = data.isMuted;
-        }
-      });
     }
-  </script>
-
-  <script type="text/javascript">
-    new Runner(".interstitial-wrapper");
   </script>
 </body>
