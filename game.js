@@ -147,6 +147,23 @@
         window.FarcadeSDK.singlePlayer.actions.ready();
         console.log("Farcade ready signal sent successfully.");
       }, 500); // 500 میلی‌ثانیه تأخیر، زمان کافی برای لود شدن پنل‌های SDK.
+
+      // 🎧 اضافه‌شده: کنترل mute/unmute از Farcade
+      window.FarcadeSDK.singlePlayer.on("toggle_mute", (data) => {
+        // اگر SDK مقدار mute را ارسال کرده، از همان استفاده کن، وگرنه toggle کن
+        const muted = data?.isMuted ?? !window.RUNNER.isMuted;
+        window.RUNNER.isMuted = muted;
+        console.log(`🔇 Sound ${muted ? "muted" : "unmuted"}`);
+
+        // در صورت وجود AudioContext، آن را متوقف یا فعال کن
+        if (window.RUNNER.audioContext) {
+          if (muted) {
+            window.RUNNER.audioContext.suspend();
+          } else {
+            window.RUNNER.audioContext.resume();
+          }
+        }
+      });
     }
 
     // 💥 استفاده از Listener امن برای شروع بازی پس از لود شدن کامل صفحه (و SDK)
