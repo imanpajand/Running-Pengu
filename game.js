@@ -102,7 +102,7 @@
       SCORE: "offline-sound-reached",
     };
     Runner.keycodes = {
-      JUMP: { 38: 1, 32: 1, 99: 1 }, // کد 99 برای دکمه اختصاصی
+      JUMP: { 38: 1, 32: 1, 99: 1 }, 
       DUCK: { 40: 1 },
       RESTART: { 13: 1 },
     };
