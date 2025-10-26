@@ -43,7 +43,7 @@
       this.audioContext = null;
       this.images = {};
       this.imagesLoaded = 0;
-      this.isMuted = false; // <-- این خط جدید را اضافه کنید
+      this.isMuted = false;
       loadImages(this);
     }
     Runner.config = {
