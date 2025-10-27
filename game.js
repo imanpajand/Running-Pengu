@@ -121,7 +121,7 @@
       FOCUS: "focus",
       LOAD: "load",
     };
-    // 🛑 این بلوک، کل کد آغازین بازی در انتهای فایل HTML را جایگزین می‌کند.
+    // 🛑
 
     function initializeGame() {
       var sdkActive = window.FarcadeSDK && window.FarcadeSDK.singlePlayer;
