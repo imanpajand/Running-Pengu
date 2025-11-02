@@ -134,7 +134,7 @@
         return;
       }
 
-      // ۲. اجرای بازی (فقط اگر SDK فعال باشد)
+      // ۲
       var containerSelector = document.querySelector("#runner-container")
         ? "#runner-container"
         : ".interstitial-wrapper";
