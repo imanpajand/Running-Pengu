@@ -141,8 +141,7 @@
       window.RUNNER = new Runner(containerSelector);
       Runner.instance_ = window.RUNNER; // make sure global instance points to the correct one
 
-      // ۳. فراخوانی ready() با یک تأخیر ایمن (Timeout) برای تضمین آمادگی پلتفرم.
-      // این تأخیر مشکل زمان‌بندی موبایل را حل می‌کند.
+
       setTimeout(() => {
         window.FarcadeSDK.singlePlayer.actions.ready();
         console.log("Farcade ready signal sent successfully.");
