@@ -129,7 +129,7 @@
       // Remix Only
       if (!sdkActive) {
         console.error("Farcade SDK not found. Game must run inside the platform.");
-        // *اختیاری*: اگر می‌خواهید چیزی نمایش داده نشود، می‌توانید Runner container را مخفی کنید.
+        // *
         // document.querySelector('#runner-container').style.display = 'none';
         return;
       }
