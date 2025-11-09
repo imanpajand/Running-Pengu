@@ -174,7 +174,7 @@
           clearInterval(sdkCheckInterval);
           initializeGame();
         } else if (document.readyState === "complete") {
-          // اگر صفحه کاملاً لود شد اما SDK لود نشد،
+          //
           // بازی را در حالت "Remix Only" متوقف کن.
           clearInterval(sdkCheckInterval);
           initializeGame(); // که در داخل آن دوباره چک می‌شود و متوقف می‌شود.
