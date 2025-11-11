@@ -149,7 +149,7 @@
 
       // 🎧 اضافه‌شده: کنترل mute/unmute از Farcade
       window.FarcadeSDK.singlePlayer.on("toggle_mute", (data) => {
-        // اگر SDK مقدار mute را ارسال کرده، از همان استفاده کن، وگرنه toggle کن
+        //
         const muted = data?.isMuted ?? !window.RUNNER.isMuted;
         window.RUNNER.isMuted = muted;
         console.log(`🔇 Sound ${muted ? "muted" : "unmuted"}`);
