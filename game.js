@@ -121,7 +121,7 @@
       FOCUS: "focus",
       LOAD: "load",
     };
-    // 🛑
+    //🛑
 
     function initializeGame() {
       var sdkActive = window.FarcadeSDK && window.FarcadeSDK.singlePlayer;
@@ -134,7 +134,7 @@
         return;
       }
 
-      // ۲
+      //
       var containerSelector = document.querySelector("#runner-container")
         ? "#runner-container"
         : ".interstitial-wrapper";
