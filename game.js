@@ -145,7 +145,7 @@
       setTimeout(() => {
         window.FarcadeSDK.singlePlayer.actions.ready();
         console.log("Farcade ready signal sent successfully.");
-      }, 500); // 500 میلی‌ثانیه تأخیر، زمان کافی برای لود شدن پنل‌های SDK.
+      }, 500); // تأخیر
 
       // 🎧 اضافه‌شده: کنترل mute/unmute از Farcade
       window.FarcadeSDK.singlePlayer.on("toggle_mute", (data) => {
