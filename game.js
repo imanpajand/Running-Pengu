@@ -177,7 +177,7 @@
           //
           // بازی را در حالت "Remix Only" متوقف کن.
           clearInterval(sdkCheckInterval);
-          initializeGame(); // که در داخل آن دوباره چک می‌شود و متوقف می‌شود.
+          initializeGame(); // 
         }
       }, 100); // هر ۱۰۰ میلی‌ثانیه چک کن
     });
