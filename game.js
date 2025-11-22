@@ -179,7 +179,7 @@
           clearInterval(sdkCheckInterval);
           initializeGame(); // 
         }
-      }, 100); // هر ۱۰۰ میلی‌ثانیه چک کن
+      }, 100); //
     });
 
     function loadImages(runner) {
