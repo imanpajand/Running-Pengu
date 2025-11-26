@@ -154,7 +154,6 @@
         window.RUNNER.isMuted = muted;
         console.log(`🔇 Sound ${muted ? "muted" : "unmuted"}`);
 
-        // در صورت وجود AudioContext، آن را متوقف یا فعال کن
         if (window.RUNNER.audioContext) {
           if (muted) {
             window.RUNNER.audioContext.suspend();
