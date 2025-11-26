@@ -175,7 +175,7 @@
           initializeGame();
         } else if (document.readyState === "complete") {
           //
-          // بازی را در حالت "Remix Only" متوقف کن.
+          // 
           clearInterval(sdkCheckInterval);
           initializeGame(); // 
         }
