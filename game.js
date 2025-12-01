@@ -126,7 +126,7 @@
     function initializeGame() {
       var sdkActive = window.FarcadeSDK && window.FarcadeSDK.singlePlayer;
 
-      // Remix Only
+      //
       if (!sdkActive) {
         console.error("Farcade SDK not found. Game must run inside the platform.");
         // *
