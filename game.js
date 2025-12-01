@@ -166,7 +166,7 @@
 
     //
     document.addEventListener("DOMContentLoaded", () => {
-      // از آنجایی که SDK ناهمگام است، از یک لوپ برای چک کردن لود شدن SDK استفاده می‌کنیم
+      //
       var sdkCheckInterval = setInterval(() => {
         // SDK و آبجکت singlePlayer باید تعریف شده باشند.
         if (window.FarcadeSDK && window.FarcadeSDK.singlePlayer && document.readyState === "complete") {
