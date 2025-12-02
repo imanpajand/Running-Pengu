@@ -168,7 +168,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       //
       var sdkCheckInterval = setInterval(() => {
-        // SDK و آبجکت singlePlayer باید تعریف شده باشند.
+        //
         if (window.FarcadeSDK && window.FarcadeSDK.singlePlayer && document.readyState === "complete") {
           clearInterval(sdkCheckInterval);
           initializeGame();
