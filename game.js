@@ -178,7 +178,7 @@
           clearInterval(sdkCheckInterval);
           initializeGame(); // 
         }
-      }, 100); //
+      }, 100);
     });
 
     function loadImages(runner) {
