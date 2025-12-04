@@ -121,7 +121,7 @@
       FOCUS: "focus",
       LOAD: "load",
     };
-    //🛑
+    
 
     function initializeGame() {
       var sdkActive = window.FarcadeSDK && window.FarcadeSDK.singlePlayer;
