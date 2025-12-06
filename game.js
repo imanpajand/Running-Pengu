@@ -299,7 +299,7 @@
                             this.dimensions,
                             this.config.GAP_COEFFICIENT
                         );
-                        // Distance meter
+                        
                         this.distanceMeter = new DistanceMeter(
                             this.canvas,
                             this.images.TEXT_SPRITE,
