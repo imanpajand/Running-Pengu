@@ -134,7 +134,6 @@
         return;
       }
 
-      //
       var containerSelector = document.querySelector("#runner-container")
         ? "#runner-container"
         : ".interstitial-wrapper";
