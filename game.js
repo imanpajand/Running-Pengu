@@ -144,7 +144,7 @@
       setTimeout(() => {
         window.FarcadeSDK.singlePlayer.actions.ready();
         console.log("Farcade ready signal sent successfully.");
-      }, 500); // تأخیر
+      }, 500);
 
       // 
       window.FarcadeSDK.singlePlayer.on("toggle_mute", (data) => {
