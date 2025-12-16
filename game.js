@@ -172,8 +172,7 @@
           clearInterval(sdkCheckInterval);
           initializeGame();
         } else if (document.readyState === "complete") {
-          //
-          // 
+
           clearInterval(sdkCheckInterval);
           initializeGame(); // 
         }
