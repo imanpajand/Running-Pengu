@@ -146,7 +146,7 @@
         console.log("Farcade ready signal sent successfully.");
       }, 500);
 
-      // 
+      
       window.FarcadeSDK.singlePlayer.on("toggle_mute", (data) => {
         //
         const muted = data?.isMuted ?? !window.RUNNER.isMuted;
