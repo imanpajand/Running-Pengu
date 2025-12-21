@@ -167,7 +167,7 @@
     document.addEventListener("DOMContentLoaded", () => {
 
       var sdkCheckInterval = setInterval(() => {
-        //
+
         if (window.FarcadeSDK && window.FarcadeSDK.singlePlayer && document.readyState === "complete") {
           clearInterval(sdkCheckInterval);
           initializeGame();
