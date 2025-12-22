@@ -332,7 +332,7 @@
         var padding = Number(boxStyles.paddingLeft.substr(0, boxStyles.paddingLeft.length - 2));
         this.dimensions.WIDTH = this.outerContainerEl.offsetWidth - padding * 2;
 
-        // 🚨 بررسی وضعیت SDK برای جلوگیری از تداخل Game Over
+
         var sdkActive = window.FarcadeSDK && window.FarcadeSDK.singlePlayer; // Redraw the elements back onto the canvas.
 
         if (this.canvas) {
