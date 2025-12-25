@@ -371,7 +371,7 @@
         if (!this.started && !this.crashed) {
           this.playingIntro = true;
           this.tRex.playingIntro = true;
-          // CSS animation definition.
+
           var keyframes =
             "@-webkit-keyframes intro { " +
             "from { width:" +
