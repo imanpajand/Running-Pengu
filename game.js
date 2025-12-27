@@ -365,7 +365,7 @@
             this.gameOverPanel.draw();
           }
         }
-      }, // ⬅️ کاما
+      }, 
 
       playIntro: function () {
         if (!this.started && !this.crashed) {
