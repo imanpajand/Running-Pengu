@@ -212,7 +212,7 @@
         window.FarcadeSDK.singlePlayer.actions.ready();
       }
 
-      // 🚨 خطوط حیاتی برای شروع بازی که باید وجود داشته باشند:
+
       runner.startListening(); // شروع گوش دادن به ورودی (کیبورد/لمس)
       runner.update(); // شروع حلقه اصلی بازی (رندرینگ)
       window.addEventListener(Runner.events.RESIZE, runner.debounceResize.bind(runner));
