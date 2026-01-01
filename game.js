@@ -342,7 +342,6 @@
               this.containerEl.style.width = this.dimensions.WIDTH + "px";
               this.containerEl.style.height = this.dimensions.HEIGHT + "px";
             }
-            // ⬅️ خروج سریع برای جلوگیری از this.clearCanvas() و redraw
           }
 
           this.canvas.width = this.dimensions.WIDTH;
