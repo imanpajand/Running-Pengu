@@ -358,7 +358,7 @@
             this.stop();
           } else {
             this.tRex.draw(0, 0);
-          } // Game over panel. (این بخش در حالت SDK فعال اجرا نمی‌شود)
+          } 
           if (this.crashed && this.gameOverPanel) {
             this.gameOverPanel.updateDimensions(this.dimensions.WIDTH);
             this.gameOverPanel.draw();
