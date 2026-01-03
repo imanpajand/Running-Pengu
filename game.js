@@ -408,7 +408,6 @@
         this.canvasCtx.clearRect(0, 0, this.dimensions.WIDTH, this.dimensions.HEIGHT);
       },
       update: function (opt_frameTime) {
-        // 🛑 جدید: توقف کامل رندرینگ در صورت فعال بودن Game Over Remix
         var sdkActive = window.FarcadeSDK && window.FarcadeSDK.singlePlayer;
         if (this.crashed && sdkActive) {
           this.stop();
