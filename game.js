@@ -213,7 +213,7 @@
       }
 
 
-      runner.startListening(); // شروع گوش دادن به ورودی (کیبورد/لمس)
+      runner.startListening(); 
       runner.update(); // شروع حلقه اصلی بازی (رندرینگ)
       window.addEventListener(Runner.events.RESIZE, runner.debounceResize.bind(runner));
     }
