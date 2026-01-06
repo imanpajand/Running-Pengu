@@ -456,7 +456,7 @@
           this.tRex.update(deltaTime);
           this.raq();
         }
-      }, // ⬅️ کاما (یا در صورتی که آخرین متد است، کاما را حذف کنید)
+      }, // کاما (یا در صورتی که آخرین متد است، کاما را حذف کنید)
       handleEvent: function (e) {
         return function (evtType, events) {
           switch (evtType) {
