@@ -214,7 +214,7 @@
 
 
       runner.startListening(); 
-      runner.update(); // شروع حلقه اصلی بازی (رندرینگ)
+      runner.update(); //
       window.addEventListener(Runner.events.RESIZE, runner.debounceResize.bind(runner));
     }
     Runner.prototype = {
